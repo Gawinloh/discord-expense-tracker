@@ -6,7 +6,8 @@ This file contains development rules and conventions for the Discord Expense Tra
 
 ### Code Style
 - **Comments First**: Every function, class, and complex logic block must have clear comments explaining its purpose
-- **Docstrings**: All functions and classes require docstrings following Python standards
+- **Docstrings**: All functions and classes require concise, single-line docstrings following Python standards
+- **Keep Docstrings Short**: Prefer `"""Get user by Discord ID."""` over verbose multi-line explanations
 - **Variable Names**: Use descriptive names (`discord_user_id` not `uid`, `expense_amount` not `amt`)
 - **Function Names**: Use action verbs (`create_user`, `calculate_balance`, `validate_amount`)
 - **Constants**: Use UPPER_CASE for constants (`DEFAULT_CURRENCY = "USD"`)
@@ -15,23 +16,20 @@ This file contains development rules and conventions for the Discord Expense Tra
 ```python
 # Example format for functions
 def create_expense(group_id: int, amount: Decimal, description: str, paid_by_user_id: int) -> Expense:
-    """
-    Create a new expense record and split it equally among group members.
-    
-    Args:
-        group_id: ID of the group where expense occurred
-        amount: Total expense amount (must be positive)
-        description: What the expense was for
-        paid_by_user_id: ID of user who paid the expense
-        
-    Returns:
-        Expense: The created expense record
-        
-    Raises:
-        ValueError: If amount is not positive
-        UserNotFoundError: If paid_by_user_id is invalid
-    """
+    """Create a new expense record and split it equally among group members."""
     # Implementation here...
+    
+# For complex functions, use inline comments instead of verbose docstrings
+def calculate_complex_balance(user_id: int, group_id: int) -> Decimal:
+    """Calculate user's net balance in a group."""
+    # Get all expense splits for this user in the group
+    user_splits = get_user_splits(user_id, group_id)
+    
+    # Calculate total owed vs total paid
+    total_owed = sum(split.amount for split in user_splits if split.amount > 0)
+    total_paid = sum(abs(split.amount) for split in user_splits if split.amount < 0)
+    
+    return total_paid - total_owed
 ```
 
 ### Error Handling
