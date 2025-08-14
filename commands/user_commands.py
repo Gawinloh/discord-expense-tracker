@@ -2,7 +2,6 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from typing import Optional
 from database import get_user_by_discord_id, create_user
 
 
