@@ -6,7 +6,8 @@
       "Bash(python:*)",
       "Bash(/opt/homebrew/bin/python3 -m pip install:*)",
       "Bash(source:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

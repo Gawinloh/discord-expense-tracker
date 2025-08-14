@@ -6,9 +6,11 @@ class SplitBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.guilds = True
+        intents.guild_messages = True
+        intents.message_content = True
         
         super().__init__(
-            command_prefix='!',
+            command_prefix='!',``
             intents=intents,
             help_command=None
         )
@@ -28,16 +30,6 @@ class SplitBot(commands.Bot):
             print(f'Synced {len(synced)} command(s)')
         except Exception as e:
             print(f'Failed to sync commands: {e}')
-    
-    async def setup_hook(self):
-        print('Bot is starting up...')
-        
-        # Load command cogs
-        try:
-            await self.load_extension('commands.user_commands')
-            print('✅ Loaded user commands')
-        except Exception as e:
-            print(f'❌ Failed to load user commands: {e}')
     
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
