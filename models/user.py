@@ -1,8 +1,4 @@
-"""User model for Discord expense tracking.
-
-Represents a Discord user who can participate in expense groups
-and track shared expenses.
-"""
+"""User model for Discord expense tracking."""
 from sqlalchemy import Column, Integer, String, DateTime, BigInteger
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -18,17 +14,7 @@ if TYPE_CHECKING:
 
 
 class User(Base):
-    """Database model for Discord users.
-    
-    Stores user information and provides relationships to expenses,
-    group memberships, and payment history.
-    
-    Attributes:
-        id: Primary key for database operations
-        discord_id: Unique Discord user ID (64-bit integer)
-        username: Display name from Discord
-        created_at: Timestamp when user was first registered
-    """
+    """Database model for Discord users."""
     __tablename__ = "users"
     
     # Primary key for internal database operations
@@ -57,9 +43,5 @@ class User(Base):
     created_groups: List['Group'] = relationship("Group", back_populates="creator")
     
     def __repr__(self) -> str:
-        """String representation of User for debugging.
-        
-        Returns:
-            str: Formatted string with key user identifiers
-        """
+        """String representation for debugging."""
         return f"<User(id={self.id}, discord_id={self.discord_id}, username='{self.username}')>"

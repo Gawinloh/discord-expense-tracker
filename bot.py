@@ -1,27 +1,14 @@
-"""Discord Expense Tracker Bot
-
-A Discord bot for tracking and splitting expenses among friends,
-similar to Splitwise functionality.
-"""
+"""Discord bot for expense tracking and splitting."""
 import discord
 from discord.ext import commands
-from typing import Optional
 from database import init_db
 
 
 class SplitBot(commands.Bot):
-    """Main Discord bot class for expense tracking functionality.
-    
-    Inherits from discord.ext.commands.Bot to provide slash command
-    support and Discord API integration.
-    """
+    """Main bot class with slash command support."""
     
     def __init__(self) -> None:
-        """Initialize the SplitBot with required intents and settings.
-        
-        Sets up Discord intents for guild access, message content, and
-        initializes the bot with slash command support.
-        """
+        """Initialize bot with Discord intents and settings."""
         # Configure Discord intents for bot functionality
         intents = discord.Intents.default()
         intents.guilds = True  # Required for guild/server access
@@ -36,13 +23,7 @@ class SplitBot(commands.Bot):
         )
     
     async def on_ready(self) -> None:
-        """Event handler called when bot successfully connects to Discord.
-        
-        Performs startup tasks:
-        - Initializes database tables
-        - Syncs slash commands with Discord
-        - Logs connection status
-        """
+        """Handle bot startup: initialize database and sync commands."""
         # Log successful Discord connection
         print(f'{self.user} has connected to Discord!')
         print(f'Bot is in {len(self.guilds)} guilds')
@@ -63,14 +44,11 @@ class SplitBot(commands.Bot):
             print(f'❌ Failed to sync commands: {sync_error}')
     
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
-        """Global error handler for legacy text commands.
-        
-        Note: This handles legacy prefix commands. Slash command errors
-        are handled individually in each command implementation.
+        """Handle errors for legacy text commands.
         
         Args:
-            ctx: Command context containing message and channel info
-            error: The error that occurred during command execution
+            ctx: Command context
+            error: The error that occurred
         """
         # Ignore unknown commands to reduce spam
         if isinstance(error, commands.CommandNotFound):

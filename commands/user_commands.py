@@ -1,7 +1,4 @@
-"""User management commands for Discord Expense Tracker.
-
-Provides slash commands for user registration and account management.
-"""
+"""User management commands for Discord Expense Tracker."""
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -10,29 +7,14 @@ from database import get_user_by_discord_id, create_user
 
 
 class UserCommands(commands.Cog):
-    """Discord cog containing user-related slash commands.
-    
-    Handles user registration, profile management, and account setup
-    for the expense tracking system.
-    """
+    """Discord cog for user-related slash commands."""
     def __init__(self, bot: commands.Bot) -> None:
-        """Initialize the UserCommands cog.
-        
-        Args:
-            bot: The Discord bot instance this cog is attached to
-        """
+        """Initialize the UserCommands cog."""
         self.bot = bot
 
     @app_commands.command(name="register", description="Register with the expense tracking bot")
     async def register(self, interaction: discord.Interaction) -> None:
-        """Register a new user with the expense tracking bot.
-        
-        Creates a new user account linked to the Discord user's ID.
-        If the user is already registered, shows their existing information.
-        
-        Args:
-            interaction: Discord interaction object containing user and channel info
-        """
+        """Register a new user with the expense tracking bot."""
         try:
             # Extract user information from Discord interaction
             discord_user_id = interaction.user.id
@@ -107,11 +89,5 @@ class UserCommands(commands.Cog):
             print(f"🔥 Registration error for Discord user {interaction.user.id}: {registration_error}")
 
 async def setup(bot: commands.Bot) -> None:
-    """Add the UserCommands cog to the bot.
-    
-    This function is called automatically when the extension is loaded.
-    
-    Args:
-        bot: The Discord bot instance to add the cog to
-    """
+    """Add the UserCommands cog to the bot."""
     await bot.add_cog(UserCommands(bot))

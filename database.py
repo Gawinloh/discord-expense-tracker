@@ -1,8 +1,4 @@
-"""Database configuration and utility functions.
-
-Provides SQLAlchemy setup, session management, and CRUD operations
-for the Discord Expense Tracker bot.
-"""
+"""Database configuration and CRUD operations."""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from typing import Optional
@@ -18,26 +14,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def get_db() -> Session:
-    """Create and return a new database session.
-    
-    Returns:
-        Session: SQLAlchemy database session for queries and transactions
-        
-    Note:
-        Caller is responsible for closing the session after use.
-    """
+    """Create and return a new database session."""
     database_session = SessionLocal()
     return database_session
 
 def init_db() -> None:
-    """Initialize database by creating all tables.
-    
-    Imports all model classes to ensure they are registered with
-    the Base metadata, then creates all tables in the database.
-    
-    Raises:
-        SQLAlchemyError: If database table creation fails
-    """
+    """Initialize database by creating all tables."""
     # Import all models to register them with Base metadata
     # This ensures all tables are created properly
     from models.user import User
@@ -50,17 +32,7 @@ def init_db() -> None:
     Base.metadata.create_all(bind=engine)
 
 def get_user_by_discord_id(discord_id: int) -> Optional['User']:
-    """Retrieve a user by their Discord ID.
-    
-    Args:
-        discord_id: The Discord user's unique identifier
-        
-    Returns:
-        Optional[User]: User model instance if found, None otherwise
-        
-    Note:
-        Automatically handles database session cleanup.
-    """
+    """Get user by Discord ID."""
     from models.user import User
     database_session = get_db()
     try:
@@ -72,19 +44,7 @@ def get_user_by_discord_id(discord_id: int) -> Optional['User']:
         database_session.close()
 
 def create_user(discord_id: int, username: str) -> 'User':
-    """Create a new user in the database.
-    
-    Args:
-        discord_id: The Discord user's unique identifier
-        username: The user's display name
-        
-    Returns:
-        User: The newly created user model instance
-        
-    Raises:
-        IntegrityError: If discord_id already exists
-        SQLAlchemyError: If database operation fails
-    """
+    """Create a new user in the database."""
     from models.user import User
     database_session = get_db()
     try:
@@ -103,14 +63,7 @@ def create_user(discord_id: int, username: str) -> 'User':
         database_session.close()
 
 def get_group_by_channel_id(channel_id: int) -> Optional['Group']:
-    """Retrieve a group by Discord channel ID.
-    
-    Args:
-        channel_id: The Discord channel's unique identifier
-        
-    Returns:
-        Optional[Group]: Group model instance if found, None otherwise
-    """
+    """Get group by Discord channel ID."""
     from models.group import Group
     database_session = get_db()
     try:
@@ -122,20 +75,7 @@ def get_group_by_channel_id(channel_id: int) -> Optional['Group']:
         database_session.close()
 
 def create_group(channel_id: int, name: str, created_by_user_id: int) -> 'Group':
-    """Create a new expense group in the database.
-    
-    Args:
-        channel_id: Discord channel ID where group is created
-        name: Human-readable name for the group
-        created_by_user_id: Database ID of the user creating the group
-        
-    Returns:
-        Group: The newly created group model instance
-        
-    Raises:
-        IntegrityError: If channel_id already has a group
-        SQLAlchemyError: If database operation fails
-    """
+    """Create a new expense group in the database."""
     from models.group import Group
     database_session = get_db()
     try:
@@ -158,19 +98,7 @@ def create_group(channel_id: int, name: str, created_by_user_id: int) -> 'Group'
         database_session.close()
 
 def add_user_to_group(user_id: int, group_id: int) -> 'GroupMember':
-    """Add a user to an expense group.
-    
-    Args:
-        user_id: Database ID of the user to add
-        group_id: Database ID of the group to join
-        
-    Returns:
-        GroupMember: The newly created group membership record
-        
-    Raises:
-        IntegrityError: If user is already a member of the group
-        SQLAlchemyError: If database operation fails
-    """
+    """Add a user to an expense group."""
     from models.group_member import GroupMember
     database_session = get_db()
     try:
