@@ -1,80 +1,117 @@
+"""User management commands for Discord Expense Tracker.
+
+Provides slash commands for user registration and account management.
+"""
 import discord
 from discord import app_commands
 from discord.ext import commands
+from typing import Optional
 from database import get_user_by_discord_id, create_user
 
+
 class UserCommands(commands.Cog):
-    def __init__(self, bot):
+    """Discord cog containing user-related slash commands.
+    
+    Handles user registration, profile management, and account setup
+    for the expense tracking system.
+    """
+    def __init__(self, bot: commands.Bot) -> None:
+        """Initialize the UserCommands cog.
+        
+        Args:
+            bot: The Discord bot instance this cog is attached to
+        """
         self.bot = bot
 
     @app_commands.command(name="register", description="Register with the expense tracking bot")
-    async def register(self, interaction: discord.Interaction):
-        """Register a new user with the bot"""
+    async def register(self, interaction: discord.Interaction) -> None:
+        """Register a new user with the expense tracking bot.
+        
+        Creates a new user account linked to the Discord user's ID.
+        If the user is already registered, shows their existing information.
+        
+        Args:
+            interaction: Discord interaction object containing user and channel info
+        """
         try:
-            # Get user information
-            discord_id = interaction.user.id
-            username = interaction.user.display_name
+            # Extract user information from Discord interaction
+            discord_user_id = interaction.user.id
+            display_username = interaction.user.display_name
             
-            # Check if user is already registered
-            existing_user = get_user_by_discord_id(discord_id)
+            # Check if user already has an account in our database
+            existing_user = get_user_by_discord_id(discord_user_id)
+            # If user already exists, show their current information
             if existing_user:
-                embed = discord.Embed(
+                already_registered_embed = discord.Embed(
                     title="Already Registered! 👋",
                     description=f"You're already registered as **{existing_user.username}**",
                     color=discord.Color.blue()
                 )
-                embed.add_field(
+                already_registered_embed.add_field(
                     name="What's Next?",
                     value="You can now create groups with `/creategroup` or join existing ones!",
                     inline=False
                 )
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+                # Send as ephemeral (private) message to avoid channel spam
+                await interaction.response.send_message(embed=already_registered_embed, ephemeral=True)
                 return
 
-            # Create new user
-            new_user = create_user(discord_id=discord_id, username=username)
+            # Create new user account in database
+            newly_created_user = create_user(discord_id=discord_user_id, username=display_username)
             
-            # Send success message
-            embed = discord.Embed(
+            # Create success message embed
+            success_embed = discord.Embed(
                 title="Welcome to Expense Tracker! 🎉",
-                description=f"Successfully registered **{new_user.username}**",
+                description=f"Successfully registered **{newly_created_user.username}**",
                 color=discord.Color.green()
             )
-            embed.add_field(
+            # Add user information fields to embed
+            success_embed.add_field(
                 name="User ID",
-                value=f"`{new_user.id}`",
+                value=f"`{newly_created_user.id}`",
                 inline=True
             )
-            embed.add_field(
+            success_embed.add_field(
                 name="Registration Date",
-                value=f"<t:{int(new_user.created_at.timestamp())}:F>",
+                value=f"<t:{int(newly_created_user.created_at.timestamp())}:F>",
                 inline=True
             )
-            embed.add_field(
+            success_embed.add_field(
                 name="Next Steps",
                 value="• Use `/creategroup` to start a new expense group\n• Wait for someone to create a group and join it",
                 inline=False
             )
-            embed.set_footer(text="You can now track expenses with friends!")
+            success_embed.set_footer(text="You can now track expenses with friends!")
             
-            await interaction.response.send_message(embed=embed)
+            # Send public success message to announce new member
+            await interaction.response.send_message(embed=success_embed)
             
-        except Exception as e:
-            # Handle errors gracefully
-            embed = discord.Embed(
+        except Exception as registration_error:
+            # Handle database or other errors gracefully with user-friendly message
+            error_embed = discord.Embed(
                 title="Registration Failed ❌",
                 description="An error occurred while registering your account.",
                 color=discord.Color.red()
             )
-            embed.add_field(
+            error_embed.add_field(
                 name="Error Details",
-                value=f"```{str(e)[:1000]}```",
+                value=f"```{str(registration_error)[:1000]}```",
                 inline=False
             )
-            embed.set_footer(text="Please try again or contact support if the issue persists.")
+            error_embed.set_footer(text="Please try again or contact support if the issue persists.")
             
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-            print(f"Registration error for user {interaction.user.id}: {e}")
+            # Send error as ephemeral message to avoid channel clutter
+            await interaction.response.send_message(embed=error_embed, ephemeral=True)
+            
+            # Log detailed error for debugging (server-side only)
+            print(f"🔥 Registration error for Discord user {interaction.user.id}: {registration_error}")
 
-async def setup(bot):
+async def setup(bot: commands.Bot) -> None:
+    """Add the UserCommands cog to the bot.
+    
+    This function is called automatically when the extension is loaded.
+    
+    Args:
+        bot: The Discord bot instance to add the cog to
+    """
     await bot.add_cog(UserCommands(bot))
